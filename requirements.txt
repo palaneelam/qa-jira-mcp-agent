@@ -1,0 +1,6 @@
+fastmcp==3.4.2
+openai
+pandas
+openpyxl
+python-dotenv
+requests
