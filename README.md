@@ -1,592 +1,665 @@
-# QA Jira MCP Agent
+# Installation and Execution Guide
 
-> **Build Intelligent AI-Powered QA Agents using MCP (Model Context Protocol), Python, GitHub Models API, and Jira Cloud.**
+# QA Jira MCP Agent Framework
 
-![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
-![FastMCP](https://img.shields.io/badge/FastMCP-3.4.2-green.svg)
-![GitHub Models](https://img.shields.io/badge/GitHub-Models-black.svg)
-![Jira](https://img.shields.io/badge/Jira-Cloud-blue.svg)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
+This guide explains how to clone the repository, install dependencies, configure environment variables, and run each version of the QA Jira MCP Agent.
 
----
+# 1. Prerequisites
 
-# 📖 Overview
+Before running this project, install:
 
-This repository demonstrates how to build AI-powered QA agents using the **Model Context Protocol (MCP)**.
-
-The project progressively evolves from generating test cases for a single Jira story to generating a complete Sprint QA Workbook.
-
-This project is designed for:
-
-* QA Engineers
-* Manual Testers
-* Automation Engineers
-* SDETs
-* QA Architects
-* AI Engineers
-* Students learning MCP
-* Anyone interested in Agentic AI for Software Testing
-
----
-
-# Project Versions
-
-## Version 1
-
-Single Jira Story → Test Cases
-
-```
-Jira Story
-
-↓
-
-Read Story
-
-↓
-
-GitHub Models
-
-↓
-
-Generate Test Cases
-
-↓
-
-Excel
-```
-
----
-
-## Version 2
-
-Single Jira Story → Complete QA Workbook
-
-Generates
-
-* Test Scenarios
-* Test Cases
-* RTM
-* Risks
-* Test Data
-
----
-
-## Version 3
-
-Multiple Jira Stories
-
-Input
-
-```
-SCRUM-8,SCRUM-9,SCRUM-10
-```
-
-Output
-
-Complete QA Workbook containing all stories.
-
----
-
-## Version 4
-
-Sprint QA Agent
-
-Input
-
-```
-JQL Query
-```
-
-Example
-
-```
-project = SCRUM ORDER BY created DESC
-```
-
-Output
-
-Complete Sprint QA Workbook.
-
----
-
-# Architecture
-
-```
-              +-----------------------+
-              |      User / QA        |
-              +-----------+-----------+
-                          |
-                          |
-                          ▼
-                 Python Application
-                          |
-                          |
-                FastMCP Client
-                          |
-             MCP Transport (STDIO)
-                          |
-                FastMCP Server
-                          |
-        +-----------------+----------------+
-        |                                  |
-        ▼                                  ▼
-   Jira REST API                  GitHub Models API
-        |                                  |
-        +-----------------+----------------+
-                          |
-                          ▼
-                  Generated QA Artifacts
-                          |
-                          ▼
-                      Excel Workbook
-```
-
----
-
-# Repository Structure
-
-```
-QA_JIRA_MCP_Agent/
-
-│
-├── shared/
-│
-├── v1_single_story_testcases/
-│
-├── v2_single_story_workbook/
-│
-├── v3_multiple_stories_workbook/
-│
-├── v4_sprint_qa_agent/
-│
-├── .env
-├── requirements.txt
-├── README.md
-└── LICENSE
-```
-
----
-
-# Technologies
-
-* Python
-* FastMCP 3.4.2
-* GitHub Models API
-* Jira Cloud REST API
-* OpenPyXL
-* Pandas
-
----
-
-# Prerequisites
-
-Install
-
-* Python 3.11+
-* VS Code
+* Python 3.11 or above
 * Git
-* GitHub Account
-* Jira Cloud Account
+* VS Code
+* Jira Cloud account
+* Jira API token
+* GitHub Models token
 
----
+# 2. Clone the Repository
 
-# Clone Repository
+Open VS Code Terminal or PowerShell.
 
+```bash
+cd C:\GIT\qa_mcp_series
 ```
-git clone https://github.com/<username>/QA_JIRA_MCP_Agent.git
 
+Clone the repository:
+
+```bash
+git clone https://github.com/palaneelam/qa-jira-mcp-agent.git
+```
+
+Move inside the project:
+
+```bash
 cd QA_JIRA_MCP_Agent
 ```
 
----
 
-# Create Virtual Environment
+# 3. Open Project in VS Code
 
-Windows
+Open manually:
 
+```text
+File → Open Folder → QA_JIRA_MCP_Agent
 ```
-python -m venv .venv
 
+# 4. Create Virtual Environment
+
+From project root:
+
+```bash
+python -m venv .venv
+```
+
+Activate virtual environment:
+
+```bash
 .venv\Scripts\activate
 ```
 
-Mac/Linux
+Expected terminal:
 
-```
-python3 -m venv .venv
-
-source .venv/bin/activate
+```text
+(.venv) PS C:\GIT\qa_mcp_series\QA_JIRA_MCP_Agent>
 ```
 
----
+# 5. Install Dependencies
 
-# Install Dependencies
+Run:
 
-```
+```bash
 pip install -r requirements.txt
 ```
 
----
+# 6. Create `.env` File
 
-# GitHub Models API Setup
+Create a file named:
 
-## Step 1
-
-Open
-
-https://github.com/marketplace/models
-
-Enable GitHub Models.
-
----
-
-## Step 2
-
-Generate GitHub Personal Access Token
-
-Scopes
-
-```
-models
-```
-
-Copy the token.
-
----
-
-# Jira Cloud Setup
-
-Create a free Jira Cloud account.
-
-Create a project.
-
-Example
-
-```
-Project Name
-
-QA Demo
-
-Project Key
-
-SCRUM
-```
-
----
-
-# Generate Jira API Token
-
-Open
-
-https://id.atlassian.com/manage-profile/security/api-tokens
-
-Click
-
-```
-Create API Token
-```
-
-Copy the generated token.
-
----
-
-# Create Sample Stories
-
-Create the following Stories.
-
-```
-SCRUM-8
-
-Online Payment using Credit Card
-```
-
-```
-SCRUM-9
-
-Apply Discount Coupon
-```
-
-```
-SCRUM-10
-
-Order Confirmation
-```
-
----
-
-# Configure Environment Variables
-
-Create
-
-```
+```text
 .env
 ```
 
-```
-GITHUB_TOKEN=xxxxxxxxxxxxxxxx
+Place it in the project root.
 
-JIRA_BASE_URL=https://yourcompany.atlassian.net
+Add:
 
-JIRA_EMAIL=your_email@gmail.com
-
-JIRA_API_TOKEN=xxxxxxxxxxxx
-```
-
----
-
-# Run Version 1
-
-```
-cd v1_single_story_testcases
-
-python main.py
+```env
+JIRA_BASE_URL=https://your-domain.atlassian.net
+JIRA_EMAIL=your-email@example.com
+JIRA_API_TOKEN=your_jira_api_token
+GITHUB_TOKEN=your_github_models_token
 ```
 
----
+Important:
 
-# Run Version 2
+* Do not add quotes.
+* Do not add spaces around `=`.
+* Do not commit `.env` to GitHub.
 
-```
-cd ..
+# 7. Recommended Execution Rule
 
-cd v2_single_story_workbook
+Always run every version using:
 
-python main.py
-```
-
----
-
-# Run Version 3
-
-```
-cd ..
-
-cd v3_multiple_stories_workbook
-
-python main.py
+```bash
+python -m folder_name.main
 ```
 
-Input
+Do not run:
 
-```
-SCRUM-8,SCRUM-9,SCRUM-10
-```
-
----
-
-# Run Version 4
-
-```
-cd ..
-
-cd v4_sprint_qa_agent
-
-python main.py
+```bash
+python folder_name/main.py
 ```
 
-Input
+Wrong:
 
+```bash
+python .\v1_single_story_testcases\main.py
 ```
+
+Correct:
+
+```bash
+python -m v1_single_story_testcases.main
+```
+
+# 8. Version 1 - Single Story Test Case Generator
+
+## Purpose
+
+Version 1 reads one Jira story and generates test cases.
+
+## Run Command
+
+```bash
+python -m v1_single_story_testcases.main
+```
+
+Expected menu:
+
+```text
+QA Jira MCP Agent
+
+1. Show Available MCP Tools
+2. Read Jira Issue
+3. Generate Test Cases from Jira Issue
+0. Exit
+```
+## Step 1: Show Available MCP Tools
+
+Select:
+
+```text
+1
+```
+
+Expected output:
+
+```text
+Available MCP Tools:
+- read_jira_issue
+- generate_test_cases_from_jira
+```
+
+## Step 2: Read Jira Issue
+
+Select:
+
+```text
+2
+```
+
+Enter issue key:
+
+```text
+SCRUM-9
+```
+
+Expected output:
+
+```text
+Jira Issue Details:
+{
+  "issue_key": "SCRUM-9",
+  "summary": "...",
+  "description": "...",
+  "status": "...",
+  "priority": "..."
+}
+```
+
+## Step 3: Generate Test Cases
+
+Select:
+
+```text
+3
+```
+
+Enter issue key:
+
+```text
+SCRUM-9
+```
+
+Expected output:
+
+```text
+Generating test cases from Jira issue...
+Test cases generated successfully.
+```
+
+Generated file location:
+
+```text
+v1_single_story_testcases/output/
+```
+
+# 9. Version 2 - Single Story QA Workbook
+
+## Purpose
+
+Version 2 generates a complete workbook for one Jira story.
+
+Workbook may include:
+
+* Story details
+* Test scenarios
+* Test cases
+* Positive cases
+* Negative cases
+* Boundary cases
+
+## Run Command
+
+```bash
+python -m v2_single_story_workbook.main
+```
+
+Expected menu:
+
+```text
+QA Jira MCP Agent - Version 2
+
+1. Show Available MCP Tools
+2. Read Jira Issue
+3. Generate Story QA Workbook
+0. Exit
+```
+
+## Generate Workbook
+
+Select:
+
+```text
+3
+```
+
+Enter Jira Issue Key:
+
+```text
+SCRUM-9
+```
+
+Expected output:
+
+```text
+Generating QA workbook...
+Workbook generated successfully.
+```
+
+Generated file location:
+
+```text
+v2_single_story_workbook/output/
+```
+
+# 10. Version 3 - Multiple Stories Workbook
+
+## Purpose
+
+Version 3 processes multiple Jira stories and generates a combined QA workbook.
+
+## Run Command
+
+```bash
+python -m v3_multiple_stories_workbook.main
+```
+
+Expected menu:
+
+```text
+QA Jira MCP Agent - Version 3
+
+1. Show Available MCP Tools
+2. Search Jira Issues by JQL
+3. Generate Multiple Stories Workbook
+0. Exit
+```
+
+## Search Jira Issues
+
+Select:
+
+```text
+2
+```
+
+Enter JQL:
+
+```sql
 project = SCRUM ORDER BY created DESC
 ```
 
----
+Max results:
 
-# Output
-
-Version 1
-
-```
-TestCases.xlsx
+```text
+5
 ```
 
-Version 2
+Expected output:
 
-```
-QA_Workbook.xlsx
-```
-
-Version 3
-
-```
-Multiple_Stories_QA_Workbook.xlsx
+```text
+SCRUM-9 - Apply Discount Coupon During Checkout
+SCRUM-8 - ...
+SCRUM-7 - ...
 ```
 
-Version 4
+## Generate Workbook
 
-```
-Sprint_QA_Workbook.xlsx
-```
+Select:
 
----
-
-# Generated QA Artifacts
-
-* Test Scenarios
-* Test Cases
-* RTM
-* Risks
-* Test Data
-* Sprint Summary
-* Cross Story Risks
-
----
-
-# Common JQL Queries
-
-All stories
-
-```
-project = SCRUM
+```text
+3
 ```
 
-Latest stories
+Enter JQL:
 
-```
+```sql
 project = SCRUM ORDER BY created DESC
 ```
 
-Only To Do
+Max results:
 
-```
-project = SCRUM AND status="To Do"
-```
-
-High Priority
-
-```
-project = SCRUM AND priority=High
+```text
+5
 ```
 
----
+Expected output:
 
-Or for only stories:
+```text
+Generating workbook for multiple stories...
+Workbook generated successfully.
+```
 
-project = SCRUM AND issuetype = Story ORDER BY created DESC
+Generated file location:
 
-Or for current sprint:
+```text
+v3_multiple_stories_workbook/output/
+```
 
+# 11. Version 4 - Sprint QA Agent
+
+## Purpose
+
+Version 4 generates a Sprint QA Workbook using Jira JQL.
+
+It can search sprint stories and generate QA artifacts for the complete sprint.
+
+## Run Command
+
+```bash
+python -m v4_sprint_qa_agent.main
+```
+
+Expected menu:
+
+```text
+QA Jira MCP Agent - Version 4
+
+1. Show Available MCP Tools
+2. Search Jira Issues by JQL
+3. Generate Sprint QA Workbook
+0. Exit
+```
+
+## Step 1: Show Available Tools
+
+Select:
+
+```text
+1
+```
+
+Expected output:
+
+```text
+Available MCP Tools:
+- search_issues_by_jql
+- generate_sprint_qa_workbook
+```
+
+## Step 2: Search Sprint Issues
+
+Select:
+
+```text
+2
+```
+
+Enter JQL:
+
+```sql
 project = SCRUM AND sprint in openSprints() ORDER BY created DESC
-
-# ❗ Troubleshooting
-
-## ModuleNotFoundError
-
-```
-No module named 'shared'
 ```
 
-Solution
+Max results:
 
-Run the application from the project root.
-
----
-
-## MCP Connection Closed
-
-Usually indicates the MCP server crashed.
-
-Verify
-
-```
-python mcp_servers/jira_server.py
+```text
+5
 ```
 
----
+Expected output:
 
-## 429 Rate Limit
-
-GitHub Models free tier has daily request limits.
-
-Wait for the quota to reset or reduce the number of AI calls.
-
----
-
-## Jira 404
-
-```
-Issue does not exist
+```text
+SCRUM-9 - Apply Discount Coupon During Checkout
+SCRUM-8 - ...
+SCRUM-7 - ...
 ```
 
-Verify:
+## Step 3: Generate Sprint QA Workbook
 
-* Jira Issue Key
-* API Token
-* Email
-* Project Permissions
+Select:
 
----
-
-## Blank Excel
-
-Usually indicates the AI returned empty JSON.
-
-Print the raw AI response and validate the JSON structure.
-
----
-
-## FileNotFoundError
-
-Ensure the folder structure matches the repository layout and the MCP server path in `mcp_client.py` points to the correct version folder.
-
----
-
-## Unicode / ₹ Character Error
-
-```
-'charmap' codec can't encode character
+```text
+3
 ```
 
-Set:
+Enter JQL:
 
+```sql
+project = SCRUM AND sprint in openSprints() ORDER BY created DESC
 ```
-PYTHONUTF8=1
-PYTHONIOENCODING=utf-8
+
+Max results:
+
+```text
+5
 ```
 
-and replace unsupported Unicode characters if necessary.
+Expected output:
 
----
+```text
+Generating Sprint QA Workbook...
+Workbook generated successfully.
+```
 
-# Future Roadmap
+Generated file location:
 
-* Playwright MCP Agent
-* Browser Automation Agent
-* Database Validation Agent
-* Requirement Analysis Agent
-* API Testing Agent
-* AI Bug Triage Agent
-* Sprint Planning Agent
-* End-to-End QA Agent Framework
+```text
+v4_sprint_qa_agent/output/
+```
 
----
+# 12. Useful JQL Examples
 
-# Contributing
+All issues from project:
 
-Contributions are welcome!
+```sql
+project = SCRUM ORDER BY created DESC
+```
 
-1. Fork the repository.
-2. Create a feature branch.
-3. Commit your changes.
-4. Push the branch.
-5. Create a Pull Request.
+Only stories:
 
----
+```sql
+project = SCRUM AND issuetype = Story ORDER BY created DESC
+```
 
-# License
+Open sprint:
 
-MIT License.
+```sql
+project = SCRUM AND sprint in openSprints() ORDER BY created DESC
+```
 
----
+Specific status:
 
-# If You Like This Project
+```sql
+project = SCRUM AND status = "To Do" ORDER BY created DESC
+```
 
-If you found this repository useful:
+Specific assignee:
 
-⭐ Star the repository
+```sql
+project = SCRUM AND assignee is not EMPTY ORDER BY created DESC
+```
 
-🍴 Fork it
 
-💬 Share it with fellow QA Engineers
 
-Happy Learning!
+# 13. Screenshot Checklist
+
+Add these screenshots to your documentation:
+
+```text
+docs/screenshots/
+│
+├── clone-repository.png
+├── open-project-vscode.png
+├── activate-venv.png
+├── install-requirements.png
+├── env-file.png
+│
+├── v1-main-menu.png
+├── v1-show-tools.png
+├── v1-read-jira-issue.png
+├── v1-generate-testcases.png
+│
+├── v2-main-menu.png
+├── v2-generate-workbook.png
+│
+├── v3-main-menu.png
+├── v3-search-jira-issues.png
+├── v3-generate-workbook.png
+│
+├── v4-main-menu.png
+├── v4-show-tools.png
+├── v4-search-sprint.png
+└── v4-generate-sprint-workbook.png
+```
+
+
+
+# 14. How to Take VS Code Terminal Screenshots
+
+Recommended approach:
+
+1. Open VS Code.
+2. Open Terminal.
+3. Run the required command.
+4. Make sure the command and output are visible.
+5. Use Windows Snipping Tool.
+6. Save the image inside:
+
+```text
+docs/screenshots/
+```
+
+Use clear file names.
+
+Example:
+
+```text
+v4-search-sprint.png
+```
+
+
+# 15. Common Execution Mistakes
+
+## Mistake 1: Running main.py Directly
+
+Wrong:
+
+```bash
+python .\v1_single_story_testcases\main.py
+```
+
+Correct:
+
+```bash
+python -m v1_single_story_testcases.main
+```
+
+
+
+## Mistake 2: Running from Wrong Folder
+
+Always run from project root:
+
+```text
+QA_JIRA_MCP_Agent
+```
+
+
+
+## Mistake 3: Virtual Environment Not Activated
+
+Expected prompt:
+
+```text
+(.venv) PS C:\GIT\qa_mcp_series\QA_JIRA_MCP_Agent>
+```
+
+
+
+## Mistake 4: Wrong JQL
+
+Wrong:
+
+```sql
+SCRUM ORDER BY created DESC
+```
+
+Correct:
+
+```sql
+project = SCRUM ORDER BY created DESC
+```
+
+
+
+# 16. Final Verification Checklist
+
+Before execution, confirm:
+
+```text
+[ ] Python is installed
+[ ] Virtual environment is activated
+[ ] Dependencies are installed
+[ ] .env file exists
+[ ] Jira credentials are correct
+[ ] GitHub token is correct
+[ ] Running from project root
+[ ] Using python -m command
+[ ] Correct JQL is used
+```
+
+
+
+# 17. Recommended First-Time Execution Order
+
+Use this order when running the project for the first time:
+
+```text
+1. Clone repository
+2. Create virtual environment
+3. Install dependencies
+4. Create .env file
+5. Run Version 1
+6. Show MCP tools
+7. Read one Jira issue
+8. Generate single story test cases
+9. Run Version 4
+10. Search sprint stories
+11. Generate sprint workbook
+```
+
+This gives confidence that both Jira and GitHub Models are working correctly.
+
+
+
+# Summary
+
+This project is designed as a progressive QA MCP learning framework.
+
+Each version builds on the previous version:
+
+```text
+Version 1 → Single Story Test Cases
+Version 2 → Single Story Workbook
+Version 3 → Multiple Stories Workbook
+Version 4 → Sprint QA Agent
+```
+
+Always run commands from the project root using:
+
+```bash
+python -m version_folder.main
+```
