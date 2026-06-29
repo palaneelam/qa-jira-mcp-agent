@@ -6,13 +6,6 @@ from openai import OpenAI
 
 load_dotenv()
 
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-
-client = OpenAI(
-    base_url="https://models.inference.ai.azure.com",
-    api_key=GITHUB_TOKEN
-)
-
 
 def clean_json_response(text):
     text = text.strip()
@@ -30,7 +23,21 @@ def clean_json_response(text):
     return text
 
 
+def get_openai_client():
+    github_token = os.getenv("GITHUB_TOKEN")
+
+    if not github_token:
+        raise ValueError("GITHUB_TOKEN is missing in .env file")
+
+    return OpenAI(
+        base_url="https://models.inference.ai.azure.com",
+        api_key=github_token
+    )
+
+
 def call_github_models_json(prompt):
+    client = get_openai_client()
+
     response = client.chat.completions.create(
         model="gpt-4.1",
         messages=[

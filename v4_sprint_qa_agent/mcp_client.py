@@ -1,8 +1,32 @@
+# from pathlib import Path
+
+# from fastmcp import Client
+# from fastmcp.client.transports import PythonStdioTransport
+
+# import json
+
+import json
 from pathlib import Path
 
 from fastmcp import Client
 from fastmcp.client.transports import PythonStdioTransport
+import os
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+SERVER_PATH = os.path.join(
+    BASE_DIR,
+    "mcp_servers",
+    "jira_server.py"
+)
+
+transport = PythonStdioTransport(
+    script_path=SERVER_PATH,
+    python_cmd="python",
+    cwd=os.path.dirname(BASE_DIR)
+)
+
+client = Client(transport)
 
 def get_server_path():
     return (
@@ -10,7 +34,6 @@ def get_server_path():
         / "mcp_servers"
         / "jira_server.py"
     )
-
 
 def create_transport():
     server_path = get_server_path()
@@ -25,8 +48,6 @@ def create_transport():
             "PYTHONUTF8": "1"
         }
     )
-
-import json
 
 async def call_mcp_tool(tool_name, arguments=None):
     transport = create_transport()

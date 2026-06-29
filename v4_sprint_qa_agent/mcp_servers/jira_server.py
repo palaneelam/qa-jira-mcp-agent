@@ -193,14 +193,47 @@ def generate_complete_qa_workbook_for_multiple_stories(issue_keys: str):
 
 @mcp.tool()
 def search_issues_by_jql(jql: str, max_results: int = 10):
-    """
-    Search Jira issues using JQL.
-    """
+    try:
+        response = search_jira_issues_by_jql(jql, max_results)
 
-    return search_jira_issues_by_jql(
-        jql,
-        max_results
-    )
+        if not response:
+            return []
+
+        if response.get("error"):
+            return response
+
+        issues = []
+
+        for issue in response.get("issues", []):
+            if not issue:
+                continue
+
+            fields = issue.get("fields") or {}
+
+            issue_type = fields.get("issuetype") or {}
+            status = fields.get("status") or {}
+            priority = fields.get("priority") or {}
+            assignee = fields.get("assignee") or {}
+            reporter = fields.get("reporter") or {}
+
+            issues.append({
+                "issue_key": issue.get("key", ""),
+                "summary": fields.get("summary") or "",
+                "description": fields.get("description") or "",
+                "issue_type": issue_type.get("name", "Unknown"),
+                "status": status.get("name", "Unknown"),
+                "priority": priority.get("name", "Unassigned"),
+                "assignee": assignee.get("displayName", "Unassigned"),
+                "reporter": reporter.get("displayName", "Unknown")
+            })
+
+        return issues
+
+    except Exception as e:
+        return {
+            "error": True,
+            "message": str(e)
+        }
 
 
 @mcp.tool()

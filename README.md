@@ -460,6 +460,14 @@ project = SCRUM AND priority=High
 
 ---
 
+Or for only stories:
+
+project = SCRUM AND issuetype = Story ORDER BY created DESC
+
+Or for current sprint:
+
+project = SCRUM AND sprint in openSprints() ORDER BY created DESC
+
 # ❗ Troubleshooting
 
 ## ModuleNotFoundError

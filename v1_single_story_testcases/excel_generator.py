@@ -3,12 +3,11 @@ from pathlib import Path
 from openpyxl.styles import Font, PatternFill, Alignment
 from openpyxl.utils import get_column_letter
 
-OUTPUT_FOLDER = Path("output")
-
+BASE_DIR = Path(__file__).resolve().parent
+OUTPUT_FOLDER = BASE_DIR / "output"
 
 def ensure_output_folder():
     OUTPUT_FOLDER.mkdir(exist_ok=True)
-
 
 def format_excel(file_path):
     from openpyxl import load_workbook

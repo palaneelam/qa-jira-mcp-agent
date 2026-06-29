@@ -1,58 +1,102 @@
-from pathlib import Path
+import os
+import sys
 
 from fastmcp import Client
-from fastmcp.client.transports import PythonStdioTransport
+from fastmcp.client.transports import StdioTransport
+
+# ==========================================================
+# Project Configuration
+# ==========================================================
+
+PROJECT_ROOT = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..")
+)
 
 
-def get_server_path():
-    return (
-        Path(__file__).parent
-        / "mcp_servers"
-        / "jira_server.py"
+def get_client():
+    """
+    Creates a new MCP client instance.
+
+    A new client is created for every request.
+    This avoids stale sessions and 'Connection closed' errors.
+    """
+
+    transport = StdioTransport(
+        command=sys.executable,
+        args=[
+            "-m",
+            "v1_single_story_testcases.mcp_servers.jira_server"
+        ],
+        cwd=PROJECT_ROOT
     )
 
+    return Client(transport)
 
-async def call_mcp_tool(tool_name, arguments=None):
-    server_path = get_server_path()
 
-    transport = PythonStdioTransport(
-    script_path=str(server_path),
-    env={
-        "PYTHONIOENCODING": "utf-8",
-        "PYTHONUTF8": "1"
-        }
-    )
+# ==========================================================
+# Generic MCP Caller
+# ==========================================================
 
-    client = Client(transport)
+async def call_mcp_tool(tool_name: str, arguments: dict | None = None):
+    """
+    Calls any MCP Tool.
+    """
 
-    async with client:
-        result = await client.call_tool(
-            tool_name,
-            arguments or {}
-        )
+    try:
 
-        return result.data
+        client = get_client()
 
+        async with client:
+
+            result = await client.call_tool(
+                tool_name,
+                arguments or {}
+            )
+
+            # FastMCP generally returns .data
+            return result.data
+
+    except Exception as ex:
+
+        print(f"\nMCP Tool Error ({tool_name})")
+        print(ex)
+
+        raise
+
+
+# ==========================================================
+# Utility Functions
+# ==========================================================
 
 async def show_available_tools():
-    server_path = get_server_path()
 
-    transport = PythonStdioTransport(
-        script_path=str(server_path)
-    )
+    try:
 
-    client = Client(transport)
+        client = get_client()
 
-    async with client:
-        tools = await client.list_tools()
+        async with client:
 
-        print("\nAvailable MCP Tools:")
+            tools = await client.list_tools()
 
-        for tool in tools:
-            print(f"- {tool.name}")
+            print("\nAvailable MCP Tools:")
+
+            for tool in tools:
+                print(f"- {tool.name}")
+
+    except Exception as ex:
+
+        print("\nUnable to retrieve MCP tools")
+        print(ex)
+
+        raise
 
 
-async def read_jira_issue_from_mcp(issue_key):
+# ==========================================================
+# Jira Tools
+# ==========================================================
+
+async def read_jira_issue_from_mcp(issue_key: str):
+
     return await call_mcp_tool(
         "read_jira_issue",
         {
@@ -61,7 +105,8 @@ async def read_jira_issue_from_mcp(issue_key):
     )
 
 
-async def generate_test_cases_from_mcp(issue_key):
+async def generate_test_cases_from_mcp(issue_key: str):
+
     return await call_mcp_tool(
         "generate_test_cases_from_jira",
         {
